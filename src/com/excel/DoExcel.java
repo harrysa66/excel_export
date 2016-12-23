@@ -81,7 +81,7 @@ public class DoExcel extends JFrame implements ActionListener{
                         int column = table.columnAtPoint(p);
                         if(column == 3){
                             List<UserExport> userExportList = (List<UserExport>)table.getModel().getValueAt(row, column+1);
-                            if(userExportList != null && userExportList.size() > 0){//TODO 添加人员信息
+                            if(userExportList != null && userExportList.size() > 0){
                                 System.out.println(userExportList);
                                 JFrame frame = new JFrame("人员列表");
                                 frame.setLayout(null);
