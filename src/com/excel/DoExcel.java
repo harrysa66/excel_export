@@ -1,5 +1,7 @@
 package com.excel;
 
+import com.excel.table.UserExportTable;
+import com.excel.table.UserMoneyTable;
 import com.excel.util.*;
 import com.excel.vo.User;
 import com.excel.vo.UserExport;
