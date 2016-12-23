@@ -1,5 +1,8 @@
 package com.excel.vo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Administrator on 2016/12/21 0021.
  */
@@ -14,6 +17,7 @@ public class UserExport {
     private String accountCity;//账户所在市
     private String accountNetwork;//账户所属网点
     private String mobilePhone;//手机
+    public static List<UserExport> userExports=new ArrayList<UserExport>();
 
     public String getUserNo() {
         return userNo;

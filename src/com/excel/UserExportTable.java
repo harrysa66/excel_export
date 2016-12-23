@@ -1,17 +1,19 @@
 package com.excel;
 
-import com.excel.vo.UserMoneyExport;
+import com.excel.vo.UserExport;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
- * Created by Administrator on 2016/12/21 0021.
+ * Created by harrysa66 on 2016/12/23.
  */
-public class UserMoneyTable extends JTable{
+public class UserExportTable extends JTable {
     //JTable表分页信息相关变量
     public int currentPage=1;
     public int pageCount=50;
@@ -21,26 +23,13 @@ public class UserMoneyTable extends JTable{
     public int restCount;
     public Object[][] resultData;
     //JTable表信息相关变量
-    public List<UserMoneyExport> userMoneys=UserMoneyExport.userMoneys;
-    public String[] columnNames={"序号","金额","数量","操作",""};
+    public List<UserExport> userExports=UserExport.userExports;
+    public String[] columnNames={"序号","客户编号","客户名称","账号","账户类型","开户行行别","账户所在省","账户所在市","账户所属网点","手机"};
     public DefaultTableModel model=null;
-    public UserMoneyTable(){initTable();}
+    public UserExportTable(){initTable();}
 
     public boolean isCellEditable(int row, int column) {				// 表格不可编辑
         return false;
-    }
-    // 隐藏列
-    public void HiddenCell(JTable table, int column) {
-        TableColumn tc = table.getTableHeader().getColumnModel().getColumn(
-                column);
-        tc.setMaxWidth(0);
-        tc.setPreferredWidth(0);
-        tc.setWidth(0);
-        tc.setMinWidth(0);
-        table.getTableHeader().getColumnModel().getColumn(column)
-                .setMaxWidth(0);
-        table.getTableHeader().getColumnModel().getColumn(column)
-                .setMinWidth(0);
     }
     /**
      * 获取下一页
@@ -89,15 +78,15 @@ public class UserMoneyTable extends JTable{
     }
     /**
      * 获得原始数据集
-     * @param userMoneys
+     * @param userExports
      * @return
      */
-    public Object[][] getData(List<UserMoneyExport> userMoneys){
-        if(userMoneys.size()>0){
-            Object[][] data=new Object[userMoneys.size()][4];
-            for(int i=0;i<userMoneys.size();i++){
-                UserMoneyExport um=userMoneys.get(i);
-                Object[] a={i+1,um.getMoney(),um.getCount(),"查看人员信息",um.getUserExportList()};//把List集合的数据赋给Object数组
+    public Object[][] getData(List<UserExport> userExports){
+        if(userExports.size()>0){
+            Object[][] data=new Object[userExports.size()][4];
+            for(int i=0;i<userExports.size();i++){
+                UserExport ue=userExports.get(i);
+                Object[] a={i+1,ue.getUserNo(),ue.getName(),ue.getCardNo(),ue.getCardType(),ue.getAccountBank(),ue.getAccountProvince(),ue.getAccountCity(),ue.getAccountNetwork(),ue.getMobilePhone()};//把List集合的数据赋给Object数组
                 data[i]=a;//把数组的值赋给二维数组的一行
             }
             return data;
@@ -146,7 +135,7 @@ public class UserMoneyTable extends JTable{
      * 初始化表格数据
      */
     public void initTable(){
-        Object[][] data=getData(userMoneys);
+        Object[][] data=getData(userExports);
         if(data!=null){
             initResultData(data);
             model=new DefaultTableModel(getPageData(),columnNames);
@@ -158,9 +147,30 @@ public class UserMoneyTable extends JTable{
         }
         this.setModel(model);
         this.setRowHeight(20);
+        FitTableColumns(this);
         DefaultTableCellRenderer r=new DefaultTableCellRenderer();
         r.setHorizontalAlignment(JLabel.CENTER);
         setDefaultRenderer(Object.class, r);
-        HiddenCell(this,4);
+    }
+
+    private void FitTableColumns(JTable myTable){
+        JTableHeader header = myTable.getTableHeader();
+        int rowCount = myTable.getRowCount();
+
+        Enumeration columns = myTable.getColumnModel().getColumns();
+        while(columns.hasMoreElements()){
+            TableColumn column = (TableColumn)columns.nextElement();
+            int col = header.getColumnModel().getColumnIndex(column.getIdentifier());
+            int width = (int)myTable.getTableHeader().getDefaultRenderer()
+                    .getTableCellRendererComponent(myTable, column.getIdentifier()
+                            , false, false, -1, col).getPreferredSize().getWidth();
+            for(int row = 0; row<rowCount; row++){
+                int preferedWidth = (int)myTable.getCellRenderer(row, col).getTableCellRendererComponent(myTable,
+                        myTable.getValueAt(row, col), false, false, row, col).getPreferredSize().getWidth();
+                width = Math.max(width, preferedWidth);
+            }
+            header.setResizingColumn(column); // 此行很重要
+            column.setWidth(width+myTable.getIntercellSpacing().width+20);
+        }
     }
 }
