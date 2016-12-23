@@ -28,7 +28,7 @@ public class DoExcel extends JFrame implements ActionListener{
     private static JFileChooser fileChooser;
     private JScrollPane panel,userPanel;
     private JButton next,previous,export07,export03,open,userNext,userPrevious;
-    private JLabel label1,label2;
+    private JLabel label1,label2,fileLabel;
     private UserMoneyTable table;
     private UserExportTable userTable;
 
@@ -67,6 +67,9 @@ public class DoExcel extends JFrame implements ActionListener{
         export03.addActionListener(this);
         label1=new JLabel("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|总数量为0个");
         label1.setBounds((int)(this.getWidth()*0.35), (int)(this.getHeight()*0.87), 250, 20);
+        fileLabel = new JLabel("文件位置：");
+        fileLabel.setBounds(180, 10, 400, 20);
+        panel.add(fileLabel);
         table.addMouseListener(new MouseAdapter(){
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {// 单击鼠标左键
@@ -140,6 +143,7 @@ public class DoExcel extends JFrame implements ActionListener{
         this.getContentPane().add(export07);
         this.getContentPane().add(export03);
         this.getContentPane().add(label1);
+        this.getContentPane().add(fileLabel);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         open.addActionListener(this);
@@ -159,10 +163,22 @@ public class DoExcel extends JFrame implements ActionListener{
             if(i==-1)return;
         }
         if(button.equals(export07)){
-            exportExcel(true);
+            try {
+                exportExcel(true);
+                JOptionPane.showMessageDialog(null, "导出成功！", "", 1);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "导出失败！", "", 0);
+                e.printStackTrace();
+            }
         }
         if(button.equals(export03)){
-            exportExcel(false);
+            try {
+                exportExcel(false);
+                JOptionPane.showMessageDialog(null, "导出成功！", "", 1);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "导出失败！", "", 0);
+                e.printStackTrace();
+            }
         }
         if(button.equals(open)){
             fileChooser = new JFileChooser();
@@ -178,6 +194,7 @@ public class DoExcel extends JFrame implements ActionListener{
                 CacheManager.clearOnly("moneyGroup");
                 CacheManager.clearOnly("totalCount");
                 UserMoneyExport.userMoneys.clear();
+                fileLabel.setText("文件位置："+chooseFile);
                 try{
                     String[] fieldNames = new String[]{"username", "cardNumber", "date", "money", "status"};
                     boolean isE2007 = false;
@@ -240,6 +257,8 @@ public class DoExcel extends JFrame implements ActionListener{
                     e.printStackTrace();
                 }
 
+            }else{
+                return;
             }
         }
         DefaultTableModel model=new DefaultTableModel(table.getPageData(),table.columnNames);
@@ -255,11 +274,11 @@ public class DoExcel extends JFrame implements ActionListener{
                 .setMaxWidth(0);
         table.getTableHeader().getColumnModel().getColumn(4)
                 .setMinWidth(0);
-        label1.setText("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|总数量为"+CacheManager.getCacheInfo("totalCount").getValue()+"个");
+        label1.setText("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|总数量为"+(CacheManager.getCacheInfo("totalCount")==null?"0":CacheManager.getCacheInfo("totalCount").getValue())+"个");
 
     }
 
-    private void exportExcel(boolean is07){
+    private void exportExcel(boolean is07) throws Exception {
         int[] rows = table.getSelectedRows();
         String[] fieldNames = new String[]{"userNo","cardNo","name","cardType","accountBank","accountProvince","accountCity","accountNetwork","mobilePhone"};
         String[] titles = new String[]{"序号","账号","账户名称","账户类型","开户行行别","账户所在省","账户所在市","账户所属网点","手机"};
@@ -277,25 +296,13 @@ public class DoExcel extends JFrame implements ActionListener{
                 List<UserExport> tempUserExports = (List<UserExport>) table.getValueAt(row,4);
                 userExports.addAll(tempUserExports);
             }
-            try {
-                exportExcelList(userExports,count.toString().substring(0,count.toString().length()-1),money.toString().substring(0,money.toString().length()-1),fieldNames,titles,is07);
-                JOptionPane.showMessageDialog(null, "导出成功！", "", 1);
-            } catch (Exception e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(null, "导出失败！", "", 0);
-            }
+            exportExcelList(userExports, count.toString().substring(0, count.toString().length() - 1), money.toString().substring(0, money.toString().length() - 1), fieldNames, titles, is07);
         }else if(totalMoneyCount >= 60){
             for (int row : rows) {
                 String count = StringUtil.toString(table.getValueAt(row,0));
                 String money = StringUtil.toString(table.getValueAt(row,1));
-                List<UserExport> userExports = (List<UserExport>) table.getValueAt(row,3);
-                try {
-                    exportExcelList(userExports,count,money,fieldNames,titles,is07);
-                    JOptionPane.showMessageDialog(null, "导出成功！", "", 1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    JOptionPane.showMessageDialog(null, "导出失败！", "", 0);
-                }
+                List<UserExport> userExports = (List<UserExport>) table.getValueAt(row,4);
+                exportExcelList(userExports,count,money,fieldNames,titles,is07);
             }
         }else{
             return;
