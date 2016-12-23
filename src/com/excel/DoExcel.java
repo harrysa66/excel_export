@@ -37,11 +37,11 @@ public class DoExcel extends JFrame implements ActionListener{
     public DoExcel (){
         table=new UserMoneyTable();
         panel = new JScrollPane(table);
-        panel.setBounds(10, 50, 470, 523);
+        panel.setBounds(10, 50, 470, 623);
         JLabel excelLabel = new JLabel("文件：");
         open=new JButton("导入");
         this.setTitle("导入Excel");
-        this.setSize(500, 700);
+        this.setSize(500, 800);
         this.setLocationRelativeTo(null);
         this.add(panel);
         excelLabel.setBounds(40, 10, 70, 20);
@@ -49,13 +49,13 @@ public class DoExcel extends JFrame implements ActionListener{
         open.setBounds(80, 10, 75, 20);
         panel.add(open);
         previous=new JButton("上一页");
-        previous.setBounds(50, 600, 75,20);
+        previous.setBounds(50, 700, 75,20);
         next=new JButton("下一页");
-        next.setBounds(150, 600, 75, 20);
+        next.setBounds(150, 700, 75, 20);
         export07=new JButton("导出07");
-        export07.setBounds(250, 600, 75, 20);
+        export07.setBounds(250, 700, 75, 20);
         export03=new JButton("导出03");
-        export03.setBounds(350, 600, 75, 20);
+        export03.setBounds(350, 700, 75, 20);
         previous.addActionListener(this);
         next.addActionListener(this);
         export07.addActionListener(this);
@@ -229,7 +229,7 @@ public class DoExcel extends JFrame implements ActionListener{
             for (int row : rows) {
                 count.append(StringUtil.toString(table.getValueAt(row,0))).append("&");
                 money.append(StringUtil.toString(table.getValueAt(row,1))).append("&");
-                List<UserExport> tempUserExports = (List<UserExport>) table.getValueAt(row,4);
+                List<UserExport> tempUserExports = (List<UserExport>) table.getValueAt(row,3);
                 userExports.addAll(tempUserExports);
             }
             try {
