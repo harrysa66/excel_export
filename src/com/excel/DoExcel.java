@@ -125,8 +125,16 @@ public class DoExcel extends JFrame implements ActionListener{
                                 userExport07.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        if(userTable.getSelectedRowCount() > 0){
+                                        List<UserExport> userExports = new ArrayList<UserExport>();
+                                        UserExport userExport = null;
+                                        int rowCount = userTable.getSelectedRowCount();
+                                        if(rowCount > 0){
+                                            for (int i = 0 ; i < rowCount ; i++){
+                                                userExport = new UserExport();
+                                                userExport.setUserNo(StringUtil.toString(userTable.getValueAt(i,0)));
 
+                                                userExports.add(userExport);
+                                            }
                                         }else{
 
                                         }
