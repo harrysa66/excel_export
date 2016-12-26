@@ -134,6 +134,7 @@ public class UserMoneyTable extends JTable{
         }else{
             //在动态改变数据结果集的时候，如果当前页没有数据了，则回到前一页（一般针对最后一页而言）
             if(pageCount*(this.getCurrentPage()-1)>=totalRowCount)this.currentPage--;
+            if(this.currentPage < 0)this.currentPage = 0;
             for(int i=pageCount*(this.getCurrentPage()-1);i<pageCount*(this.getCurrentPage()-1)+restCount;i++){
                 for(int j=0;j<column;j++){
                     currentPageData[i%pageCount][j]=resultData[i][j];

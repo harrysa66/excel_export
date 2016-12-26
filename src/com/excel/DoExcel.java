@@ -29,7 +29,7 @@ public class DoExcel extends JFrame implements ActionListener{
     public static File chooseFile;
     private static JFileChooser fileChooser;
     private JScrollPane panel,userPanel;
-    private JButton next,previous,export07,export03,open,userNext,userPrevious;
+    private JButton next,previous,export07,export03,open,userNext,userPrevious,userExport07,userExport03;
     private JLabel label1,label2,fileLabel;
     private UserMoneyTable table;
     private UserExportTable userTable;
@@ -67,8 +67,8 @@ public class DoExcel extends JFrame implements ActionListener{
         next.addActionListener(this);
         export07.addActionListener(this);
         export03.addActionListener(this);
-        label1=new JLabel("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|总数量为0个");
-        label1.setBounds((int)(this.getWidth()*0.35), (int)(this.getHeight()*0.87), 250, 20);
+        label1=new JLabel("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|共"+table.totalPage+"页|总数量为0个");
+        label1.setBounds((int)(this.getWidth()*0.3), (int)(this.getHeight()*0.87), 300, 20);
         fileLabel = new JLabel("文件位置：");
         fileLabel.setBounds(180, 10, 400, 20);
         panel.add(fileLabel);
@@ -83,7 +83,7 @@ public class DoExcel extends JFrame implements ActionListener{
                             List<UserExport> userExportList = (List<UserExport>)table.getModel().getValueAt(row, column+1);
                             if(userExportList != null && userExportList.size() > 0){
                                 System.out.println(userExportList);
-                                JFrame frame = new JFrame("人员列表");
+                                JFrame frame = new JFrame("人员列表-"+table.getModel().getValueAt(row,1));
                                 frame.setLayout(null);
                                 sizeWindowOnScreen(frame,0.65,0.9);
                                 frame.setLocationRelativeTo(null);
@@ -93,9 +93,13 @@ public class DoExcel extends JFrame implements ActionListener{
                                 userPanel.setBounds(0, 0, (int)(frame.getWidth()*0.99), (int)(frame.getHeight()*0.85));
                                 frame.add(userPanel);
                                 userPrevious=new JButton("上一页");
-                                userPrevious.setBounds((int)(frame.getWidth()*0.35), (int)(frame.getHeight()*0.92), 75,20);
+                                userPrevious.setBounds((int)(frame.getWidth()*0.2), (int)(frame.getHeight()*0.92), 75,20);
                                 userNext=new JButton("下一页");
-                                userNext.setBounds((int)(frame.getWidth()*0.55), (int)(frame.getHeight()*0.92), 75, 20);
+                                userNext.setBounds((int)(frame.getWidth()*0.4), (int)(frame.getHeight()*0.92), 75, 20);
+                                userExport07=new JButton("导出07");
+                                userExport07.setBounds((int)(frame.getWidth()*0.6), (int)(frame.getHeight()*0.92), 75, 20);
+                                userExport03=new JButton("导出03");
+                                userExport03.setBounds((int)(frame.getWidth()*0.8), (int)(frame.getHeight()*0.92), 75, 20);
                                 userPrevious.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
@@ -104,7 +108,7 @@ public class DoExcel extends JFrame implements ActionListener{
                                         DefaultTableModel model=new DefaultTableModel(userTable.getPageData(),userTable.columnNames);
                                         userTable.setModel(model);
                                         FitTableColumns(userTable);
-                                        label2.setText("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页");
+                                        label2.setText("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页|共"+userTable.totalPage+"页");
                                     }
                                 });
                                 userNext.addActionListener(new ActionListener() {
@@ -115,20 +119,38 @@ public class DoExcel extends JFrame implements ActionListener{
                                         DefaultTableModel model=new DefaultTableModel(userTable.getPageData(),userTable.columnNames);
                                         userTable.setModel(model);
                                         FitTableColumns(userTable);
-                                        label2.setText("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页");
+                                        label2.setText("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页|共"+userTable.totalPage+"页");
                                     }
                                 });
-                                label2=new JLabel("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页");
-                                label2.setBounds((int)(frame.getWidth()*0.4), (int)(frame.getHeight()*0.87), 150, 20);
+                                userExport07.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        if(userTable.getSelectedRowCount() > 0){
+
+                                        }else{
+
+                                        }
+                                    }
+                                });
+                                userExport03.addActionListener(new ActionListener() {
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+
+                                    }
+                                });
+                                label2=new JLabel("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页|共"+userTable.totalPage+"页");
+                                label2.setBounds((int)(frame.getWidth()*0.4), (int)(frame.getHeight()*0.87), 200, 20);
                                 frame.getContentPane().setLayout(null);
                                 frame.getContentPane().add(userPanel);
                                 frame.getContentPane().add(userPrevious);
                                 frame.getContentPane().add(userNext);
+                                frame.getContentPane().add(userExport07);
+                                frame.getContentPane().add(userExport03);
                                 frame.getContentPane().add(label2);
                                 UserExport.userExports.clear();
                                 UserExport.userExports.addAll(userExportList);
                                 userTable.initTable();
-                                label2.setText("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页");
+                                label2.setText("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页|共"+userTable.totalPage+"页");
                                 frame.setVisible(true);
                             }
                         }
@@ -167,18 +189,16 @@ public class DoExcel extends JFrame implements ActionListener{
         if(button.equals(export07)){
             try {
                 exportExcel(true);
-                JOptionPane.showMessageDialog(null, "导出成功！", "", 1);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "导出失败！", "", 0);
+                JOptionPane.showMessageDialog(null, "导出失败！", "消息", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         }
         if(button.equals(export03)){
             try {
                 exportExcel(false);
-                JOptionPane.showMessageDialog(null, "导出成功！", "", 1);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "导出失败！", "", 0);
+                JOptionPane.showMessageDialog(null, "导出失败！", "消息", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
         }
@@ -254,7 +274,7 @@ public class DoExcel extends JFrame implements ActionListener{
                     System.out.println(CacheManager.getCacheInfo("moneyGroup"));
                     UserMoneyExport.userMoneys.addAll((List<UserMoneyExport>) CacheManager.getCacheInfo("moneyGroup").getValue());
                     table.initTable();
-                    label1.setText("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|总数量为"+CacheManager.getCacheInfo("totalCount").getValue()+"个");
+                    label1.setText("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|共"+table.totalPage+"页|总数量为"+CacheManager.getCacheInfo("totalCount").getValue()+"个");
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -276,12 +296,74 @@ public class DoExcel extends JFrame implements ActionListener{
                 .setMaxWidth(0);
         table.getTableHeader().getColumnModel().getColumn(4)
                 .setMinWidth(0);
-        label1.setText("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|总数量为"+(CacheManager.getCacheInfo("totalCount")==null?"0":CacheManager.getCacheInfo("totalCount").getValue())+"个");
+        label1.setText("总共"+table.totalRowCount+"记录|当前第"+table.currentPage+"页|共"+table.totalPage+"页|总数量为"+(CacheManager.getCacheInfo("totalCount")==null?"0":CacheManager.getCacheInfo("totalCount").getValue())+"个");
 
     }
 
     private void exportExcel(boolean is07) throws Exception {
         int[] rows = table.getSelectedRows();
+        String[] fieldNames = new String[]{"userNo","cardNo","name","cardType","accountBank","accountProvince","accountCity","accountNetwork","mobilePhone"};
+        String[] titles = new String[]{"序号","账号","账户名称","账户类型","开户行行别","账户所在省","账户所在市","账户所属网点","手机"};
+        int totalMoneyCount = 0;
+        for (int row : rows) {
+            String moneyCount = StringUtil.toString(table.getValueAt(row, 2));
+            if(StringUtil.isBlank(moneyCount)){
+                continue;
+            }
+            totalMoneyCount = totalMoneyCount + Integer.parseInt(moneyCount);
+        }
+        if(totalMoneyCount < 60 && totalMoneyCount > 0){
+            List<UserExport> userExports = new ArrayList<UserExport>();
+            StringBuffer count = new StringBuffer();
+            StringBuffer money = new StringBuffer();
+            for (int row : rows) {
+                count.append(StringUtil.toString(table.getValueAt(row,0))).append("&");
+                money.append(StringUtil.toString(table.getValueAt(row,1))).append("&");
+                List<UserExport> tempUserExports = (List<UserExport>) table.getValueAt(row,4);
+                userExports.addAll(tempUserExports);
+            }
+            exportExcelList(userExports, count.toString().substring(0, count.toString().length() - 1), money.toString().substring(0, money.toString().length() - 1), fieldNames, titles, is07);
+            JOptionPane.showMessageDialog(null, "导出成功！", "消息", JOptionPane.INFORMATION_MESSAGE);
+        }else if(totalMoneyCount >= 60){
+            for (int row : rows) {
+                String count = StringUtil.toString(table.getValueAt(row,0));
+                String money = StringUtil.toString(table.getValueAt(row,1));
+                List<UserExport> userExports = (List<UserExport>) table.getValueAt(row,4);
+                exportExcelList(userExports,count,money,fieldNames,titles,is07);
+            }
+            JOptionPane.showMessageDialog(null, "导出成功！", "消息", JOptionPane.INFORMATION_MESSAGE);
+        }else{
+            JOptionPane.showMessageDialog(null, "未获取数据！", "消息", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+    }
+
+    private void exportExcelList(List<UserExport> userExports,String count,String money,String[] fieldNames,String[] titles,boolean is07) throws Exception {
+        System.out.println(userExports);
+        int totalCount=userExports.size()%60==0?userExports.size()/60:userExports.size()/60+1;
+        for(int i =0 ; i < totalCount ; i++){
+            ExcelHelper eh;
+            if(is07){
+                String exportPath = chooseFile.getParent()+"/export-"+DateUtil.format(new Date(),"yyyyMMdd")+"-"+count+"-"+money+"("+(i+1)+").xlsx";
+                File writeFile = new File(exportPath);
+                eh = XssfExcelHelper.getInstance(writeFile);
+            }else{
+                String exportPath = chooseFile.getParent()+"/export-"+DateUtil.format(new Date(),"yyyyMMdd")+"-"+count+"-"+money+"("+(i+1)+").xls";
+                File writeFile = new File(exportPath);
+                eh = HssfExcelHelper.getInstance(writeFile);
+            }
+            int endIndex;
+            if(i==totalCount-1){
+                endIndex = userExports.size();
+            }else{
+                endIndex = 60*(i+1);
+            }
+            eh.writeExcel(UserExport.class,userExports.subList(60*i,endIndex),fieldNames,titles);
+        }
+    }
+
+    private void userExportExcel(boolean is07) throws Exception {
+        int[] rows = userTable.getSelectedRows();
         String[] fieldNames = new String[]{"userNo","cardNo","name","cardType","accountBank","accountProvince","accountCity","accountNetwork","mobilePhone"};
         String[] titles = new String[]{"序号","账号","账户名称","账户类型","开户行行别","账户所在省","账户所在市","账户所属网点","手机"};
         int totalMoneyCount = 0;
@@ -308,30 +390,6 @@ public class DoExcel extends JFrame implements ActionListener{
             }
         }else{
             return;
-        }
-    }
-
-    private void exportExcelList(List<UserExport> userExports,String count,String money,String[] fieldNames,String[] titles,boolean is07) throws Exception {
-        System.out.println(userExports);
-        int totalCount=userExports.size()%60==0?userExports.size()/60:userExports.size()/60+1;
-        for(int i =0 ; i < totalCount ; i++){
-            ExcelHelper eh;
-            if(is07){
-                String exportPath = chooseFile.getParent()+"/export-"+DateUtil.format(new Date(),"yyyyMMdd")+"-"+count+"-"+money+"("+(i+1)+").xlsx";
-                File writeFile = new File(exportPath);
-                eh = XssfExcelHelper.getInstance(writeFile);
-            }else{
-                String exportPath = chooseFile.getParent()+"/export-"+DateUtil.format(new Date(),"yyyyMMdd")+"-"+count+"-"+money+"("+(i+1)+").xls";
-                File writeFile = new File(exportPath);
-                eh = HssfExcelHelper.getInstance(writeFile);
-            }
-            int endIndex;
-            if(i==totalCount-1){
-                endIndex = userExports.size();
-            }else{
-                endIndex = 60*(i+1);
-            }
-            eh.writeExcel(UserExport.class,userExports.subList(60*i,endIndex),fieldNames,titles);
         }
     }
 
