@@ -125,25 +125,25 @@ public class DoExcel extends JFrame implements ActionListener{
                                 userExport07.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-                                        List<UserExport> userExports = new ArrayList<UserExport>();
-                                        UserExport userExport = null;
-                                        int rowCount = userTable.getSelectedRowCount();
-                                        if(rowCount > 0){
-                                            for (int i = 0 ; i < rowCount ; i++){
-                                                userExport = new UserExport();
-                                                userExport.setUserNo(StringUtil.toString(userTable.getValueAt(i,0)));
-
-                                                userExports.add(userExport);
-                                            }
-                                        }else{
-
+                                        try {
+                                            userExportExcel(true,frame.getTitle());
+                                            JOptionPane.showMessageDialog(null, "导出成功！\n导出路径："+chooseFile.getParent(), "消息", JOptionPane.INFORMATION_MESSAGE);
+                                        } catch (Exception e1) {
+                                            JOptionPane.showMessageDialog(null, "导出失败！", "消息", JOptionPane.ERROR_MESSAGE);
+                                            e1.printStackTrace();
                                         }
                                     }
                                 });
                                 userExport03.addActionListener(new ActionListener() {
                                     @Override
                                     public void actionPerformed(ActionEvent e) {
-
+                                        try {
+                                            userExportExcel(false,frame.getTitle());
+                                            JOptionPane.showMessageDialog(null, "导出成功！\n导出路径："+chooseFile.getParent(), "消息", JOptionPane.INFORMATION_MESSAGE);
+                                        } catch (Exception e1) {
+                                            JOptionPane.showMessageDialog(null, "导出失败！", "消息", JOptionPane.ERROR_MESSAGE);
+                                            e1.printStackTrace();
+                                        }
                                     }
                                 });
                                 label2=new JLabel("总共"+userTable.totalRowCount+"记录|当前第"+userTable.currentPage+"页|共"+userTable.totalPage+"页");
@@ -331,7 +331,7 @@ public class DoExcel extends JFrame implements ActionListener{
                 userExports.addAll(tempUserExports);
             }
             exportExcelList(userExports, count.toString().substring(0, count.toString().length() - 1), money.toString().substring(0, money.toString().length() - 1), fieldNames, titles, is07);
-            JOptionPane.showMessageDialog(null, "导出成功！", "消息", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "导出成功！\n导出路径："+chooseFile.getParent(), "消息", JOptionPane.INFORMATION_MESSAGE);
         }else if(totalMoneyCount >= 60){
             for (int row : rows) {
                 String count = StringUtil.toString(table.getValueAt(row,0));
@@ -339,7 +339,7 @@ public class DoExcel extends JFrame implements ActionListener{
                 List<UserExport> userExports = (List<UserExport>) table.getValueAt(row,4);
                 exportExcelList(userExports,count,money,fieldNames,titles,is07);
             }
-            JOptionPane.showMessageDialog(null, "导出成功！", "消息", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, "导出成功！\n导出路径："+chooseFile.getParent(), "消息", JOptionPane.INFORMATION_MESSAGE);
         }else{
             JOptionPane.showMessageDialog(null, "未获取数据！", "消息", JOptionPane.WARNING_MESSAGE);
             return;
@@ -370,35 +370,55 @@ public class DoExcel extends JFrame implements ActionListener{
         }
     }
 
-    private void userExportExcel(boolean is07) throws Exception {
+    private void userExportExcel(boolean is07,String frameTitle) throws Exception {
+        List<UserExport> userExports = new ArrayList<UserExport>();
+        UserExport userExport = null;
         int[] rows = userTable.getSelectedRows();
         String[] fieldNames = new String[]{"userNo","cardNo","name","cardType","accountBank","accountProvince","accountCity","accountNetwork","mobilePhone"};
         String[] titles = new String[]{"序号","账号","账户名称","账户类型","开户行行别","账户所在省","账户所在市","账户所属网点","手机"};
-        int totalMoneyCount = 0;
-        for (int row : rows) {
-            totalMoneyCount = totalMoneyCount + Integer.parseInt(StringUtil.toString(table.getValueAt(row,2)));
-        }
-        if(totalMoneyCount < 60 && totalMoneyCount > 0){
-            List<UserExport> userExports = new ArrayList<UserExport>();
-            StringBuffer count = new StringBuffer();
-            StringBuffer money = new StringBuffer();
-            for (int row : rows) {
-                count.append(StringUtil.toString(table.getValueAt(row,0))).append("&");
-                money.append(StringUtil.toString(table.getValueAt(row,1))).append("&");
-                List<UserExport> tempUserExports = (List<UserExport>) table.getValueAt(row,4);
-                userExports.addAll(tempUserExports);
-            }
-            exportExcelList(userExports, count.toString().substring(0, count.toString().length() - 1), money.toString().substring(0, money.toString().length() - 1), fieldNames, titles, is07);
-        }else if(totalMoneyCount >= 60){
-            for (int row : rows) {
-                String count = StringUtil.toString(table.getValueAt(row,0));
-                String money = StringUtil.toString(table.getValueAt(row,1));
-                List<UserExport> userExports = (List<UserExport>) table.getValueAt(row,4);
-                exportExcelList(userExports,count,money,fieldNames,titles,is07);
+        if(rows.length > 0){
+            for(int row : rows){
+                userExport = new UserExport();
+                userExport.setUserNo(StringUtil.toString(userTable.getValueAt(row,0)));
+                userExport.setName(StringUtil.toString(userTable.getValueAt(row,2)));
+                userExport.setCardNo(StringUtil.toString(userTable.getValueAt(row,3)));
+                userExport.setCardType(StringUtil.toString(userTable.getValueAt(row,4)));
+                userExport.setAccountBank(StringUtil.toString(userTable.getValueAt(row,5)));
+                userExport.setAccountProvince(StringUtil.toString(userTable.getValueAt(row,6)));
+                userExport.setAccountCity(StringUtil.toString(userTable.getValueAt(row,7)));
+                userExport.setAccountNetwork(StringUtil.toString(userTable.getValueAt(row,8)));
+                userExport.setMobilePhone(StringUtil.toString(userTable.getValueAt(row,9)));
+                userExports.add(userExport);
             }
         }else{
-            return;
+            for (int i = 0 ; i < 60 ; i++){
+                if(userTable.getValueAt(i,0) == null){
+                    continue;
+                }
+                userExport = new UserExport();
+                userExport.setUserNo(StringUtil.toString(userTable.getValueAt(i,0)));
+                userExport.setName(StringUtil.toString(userTable.getValueAt(i,2)));
+                userExport.setCardNo(StringUtil.toString(userTable.getValueAt(i,3)));
+                userExport.setCardType(StringUtil.toString(userTable.getValueAt(i,4)));
+                userExport.setAccountBank(StringUtil.toString(userTable.getValueAt(i,5)));
+                userExport.setAccountProvince(StringUtil.toString(userTable.getValueAt(i,6)));
+                userExport.setAccountCity(StringUtil.toString(userTable.getValueAt(i,7)));
+                userExport.setAccountNetwork(StringUtil.toString(userTable.getValueAt(i,8)));
+                userExport.setMobilePhone(StringUtil.toString(userTable.getValueAt(i,9)));
+                userExports.add(userExport);
+            }
         }
+        ExcelHelper eh;
+        if(is07){
+            String exportPath = chooseFile.getParent()+"/export-"+DateUtil.format(new Date(),"yyyyMMdd")+"-"+frameTitle+"-"+(rows.length == 0?60:rows.length)+".xlsx";
+            File writeFile = new File(exportPath);
+            eh = XssfExcelHelper.getInstance(writeFile);
+        }else{
+            String exportPath = chooseFile.getParent()+"/export-"+DateUtil.format(new Date(),"yyyyMMdd")+"-"+frameTitle+"-"+(rows.length == 0?60:rows.length)+".xls";
+            File writeFile = new File(exportPath);
+            eh = HssfExcelHelper.getInstance(writeFile);
+        }
+        eh.writeExcel(UserExport.class,userExports,fieldNames,titles);
     }
 
     /**
